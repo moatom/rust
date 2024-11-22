@@ -233,7 +233,7 @@ impl<'tcx> TypeckResults<'tcx> {
             adjustments: Default::default(),
             pat_binding_modes: Default::default(),
             pat_adjustments: Default::default(),
-            rust_2024_migration_desugared_pats: Default::default(),
+            rust_2024_migration_desugared_pats: Default::default(), //　what?
             skipped_ref_pats: Default::default(),
             closure_kind_origins: Default::default(),
             liberated_fn_sigs: Default::default(),
@@ -262,6 +262,7 @@ impl<'tcx> TypeckResults<'tcx> {
         }
     }
 
+    /// many defs {hir_owner, data}
     pub fn type_dependent_defs(
         &self,
     ) -> LocalTableInContext<'_, Result<(DefKind, DefId), ErrorGuaranteed>> {

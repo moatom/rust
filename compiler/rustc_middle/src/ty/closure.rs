@@ -337,7 +337,7 @@ pub fn place_to_string_for_capture<'tcx>(tcx: TyCtxt<'tcx>, place: &HirPlace<'tc
 
 #[derive(Eq, Clone, PartialEq, Debug, TyEncodable, TyDecodable, Copy, HashStable, Hash)]
 #[derive(TypeFoldable, TypeVisitable)]
-pub enum BorrowKind {
+pub enum BorrowKind { //
     /// Data must be immutable and is aliasable.
     ImmBorrow,
 

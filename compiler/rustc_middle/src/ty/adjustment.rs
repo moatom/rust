@@ -97,7 +97,7 @@ pub enum Adjust<'tcx> {
     Deref(Option<OverloadedDeref<'tcx>>),
 
     /// Take the address and produce either a `&` or `*` pointer.
-    Borrow(AutoBorrow<'tcx>),
+    Borrow(AutoBorrow<'tcx>),//
 
     Pointer(PointerCoercion),
 

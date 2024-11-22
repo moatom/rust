@@ -134,6 +134,10 @@ impl<'hir> LoweringContext<'_, 'hir> {
                     let lit = self.arena.alloc(respan(self.lower_span(e.span), lit_kind));
                     hir::ExprKind::Lit(lit)
                 }
+                ExprKind::CalcExpr(ref calc_expr) => {
+                    // HIR表現に変換する処理を実装
+                    self.expr_calc_expr(calc_expr)
+                }
                 ExprKind::IncludedBytes(bytes) => {
                     let lit = self.arena.alloc(respan(
                         self.lower_span(e.span),
@@ -902,7 +906,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
                 span,
                 hir::ExprKind::Yield(yielded, hir::YieldSource::Await { expr: Some(expr_hir_id) }),
             );
-            let yield_expr = self.arena.alloc(yield_expr);
+            let yield_expr_mut = self.arena.alloc(yield_expr);
 
             let Some(task_context_hid) = self.task_context else {
                 unreachable!("use of `await` outside of an async context.");
@@ -910,7 +914,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
 
             let lhs = self.expr_ident(span, task_context_ident, task_context_hid);
             let assign =
-                self.expr(span, hir::ExprKind::Assign(lhs, yield_expr, self.lower_span(span)));
+                self.expr(span, hir::ExprKind::Assign(lhs, yield_expr_mut, self.lower_span(span)));
             self.stmt_expr(span, assign)
         };
 
@@ -1637,7 +1641,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
         opt_label: Option<Label>,
         loop_kind: ForLoopKind,
     ) -> hir::Expr<'hir> {
-        let head = self.lower_expr_mut(head);
+        let head: rustc_hir::Expr<'_> = self.lower_expr_mut(head);
         let pat = self.lower_pat(pat);
         let for_span =
             self.mark_span_with_reason(DesugaringKind::ForLoop, self.lower_span(e.span), None);

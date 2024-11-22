@@ -1209,7 +1209,7 @@ impl<'tcx> TyCtxtFeed<'tcx, LocalDefId> {
 #[derive(Copy, Clone)]
 #[rustc_diagnostic_item = "TyCtxt"]
 #[rustc_pass_by_value]
-pub struct TyCtxt<'tcx> {
+pub struct TyCtxt<'tcx> { // TyCtxt
     gcx: &'tcx GlobalCtxt<'tcx>,
 }
 

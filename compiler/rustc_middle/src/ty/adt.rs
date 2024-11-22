@@ -306,7 +306,7 @@ impl AdtDefData {
     }
 }
 
-impl<'tcx> AdtDef<'tcx> {
+impl<'tcx> AdtDef<'tcx> { //
     /// Returns `true` if this is a struct.
     #[inline]
     pub fn is_struct(self) -> bool {

@@ -1545,6 +1545,12 @@ impl<'a> Parser<'a> {
         }
     }
 
+    fn parse_calc_expression(&mut self) -> PResult<'a, Expr> {
+        // ここで電卓式の文字列を取り出し、`CalcExpr`ノードを生成
+        let calc_expr = /* 電卓式を文字列として取得 */;
+        Ok(self.mk_expr(span, ExprKind::CalcExpr(calc_expr)))
+    }
+
     fn parse_expr_tuple_parens(&mut self, restrictions: Restrictions) -> PResult<'a, P<Expr>> {
         let lo = self.token.span;
         self.expect(&token::OpenDelim(Delimiter::Parenthesis))?;

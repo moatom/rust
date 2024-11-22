@@ -1315,7 +1315,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
 
         // We'll later suggest `.as_ref` when noting the type error,
         // so skip if we will suggest that instead.
-        if self.err_ctxt().should_suggest_as_ref(expected_ty, expr_ty).is_some() {
+        if self.err_ctxt().should_suggest_as_ref(expected_ty, expr_ty).is_some() {// message
             return false;
         }
 

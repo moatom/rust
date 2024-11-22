@@ -1420,6 +1420,8 @@ pub enum ExprKind {
     Unary(UnOp, P<Expr>),
     /// A literal (e.g., `1`, `"foo"`).
     Lit(token::Lit),
+    // 新しい電卓式のノード
+    CalcExpr(String),      // 例: calc式として表現される式（"3 + 4 * 2" などの電卓式）
     /// A cast (e.g., `foo as f64`).
     Cast(P<Expr>, P<Ty>),
     /// A type ascription (e.g., `builtin # type_ascribe(42, usize)`).
