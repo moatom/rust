@@ -18,14 +18,12 @@ fn cmp_ref(a: &u8, b: &u8) -> bool {
 #[custom_mir(dialect = "analysis", phase = "post-cleanup")]
 fn compare_address() -> bool {
     // CHECK-LABEL: fn compare_address(
-    // CHECK: bb0: {
-    // CHECK-NEXT: _1 = const 5_u8;
-    // CHECK-NEXT: _2 = &_1;
-    // CHECK-NEXT: _3 = copy _1;
-    // CHECK-NEXT: _4 = &_3;
-    // CHECK-NEXT: _0 = cmp_ref(copy _2, copy _4)
-    // CHECK: bb1: {
-    // CHECK-NEXT: _0 = opaque::<u8>(copy _3)
+    // CHECK: [[a:_.*]] = const 5_u8;
+    // CHECK: [[r1:_.*]] = &[[a]];
+    // CHECK: [[b:_.*]] = copy [[a]];
+    // CHECK: [[r2:_.*]] = &[[b]];
+    // CHECK: cmp_ref(copy [[r1]], copy [[r2]])
+    // CHECK: opaque::<u8>(copy [[b]])
     mir! {
         {
             let a = 5_u8;
@@ -49,11 +47,9 @@ fn compare_address() -> bool {
 #[custom_mir(dialect = "analysis", phase = "post-cleanup")]
 fn borrowed<T: Copy + Freeze>(x: T) -> bool {
     // CHECK-LABEL: fn borrowed(
-    // CHECK: bb0: {
-    // CHECK-NEXT: _3 = &_1;
-    // CHECK-NEXT: _0 = opaque::<&T>(copy _3)
-    // CHECK: bb1: {
-    // CHECK-NEXT: _0 = opaque::<T>(copy _1)
+    // CHECK: [[x:_.*]]: T
+    // CHECK-NOT: {{_.*}} = copy [[x]];
+    // CHECK: opaque::<T>(copy [[x]])
     mir! {
         {
             let a = x;
@@ -73,12 +69,11 @@ fn borrowed<T: Copy + Freeze>(x: T) -> bool {
 #[custom_mir(dialect = "analysis", phase = "post-cleanup")]
 fn non_freeze<T: Copy>(x: T) -> bool {
     // CHECK-LABEL: fn non_freeze(
-    // CHECK: bb0: {
-    // CHECK-NEXT: _2 = copy _1;
-    // CHECK-NEXT: _3 = &_1;
-    // CHECK-NEXT: _0 = opaque::<&T>(copy _3)
-    // CHECK: bb1: {
-    // CHECK-NEXT: _0 = opaque::<T>(copy _2)
+    // CHECK: [[x:_.*]]: T
+    // CHECK: {{_.*}} = copy [[x]];
+    // CHECK: {{_.*}} = &[[x]];
+    // CHECK-NOT: opaque::<&T>(copy [[x]])
+    // CHECK-NOT: opaque::<T>(copy [[x]])
     mir! {
         {
             let a = x;

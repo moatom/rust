@@ -1,4 +1,3 @@
-// skip-filecheck
 //@ test-mir-pass: CopyProp
 //
 // This attempts to mutate `a` via a pointer derived from `addr_of!(a)`. That is UB

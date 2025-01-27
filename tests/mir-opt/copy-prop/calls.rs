@@ -1,4 +1,3 @@
-// skip-filecheck
 // Check that CopyProp does propagate return values of call terminators.
 //@ test-mir-pass: CopyProp
 //@ needs-unwind
@@ -13,6 +12,12 @@ fn dummy(x: u8) -> u8 {
 
 // EMIT_MIR calls.nrvo.CopyProp.diff
 fn nrvo() -> u8 {
+    // CHECK-LABEL: fn nrvo(
+    // CHECK: debug y => [[y:_.*]];
+    XXX    // CHECK-NOT: StorageLive(_1);
+    // CHECK: [[y]] = dummy(const 5_u8)
+    // CHECK-NOT: _0 = copy [[y]]
+    XXX    // CHECK-NOT: StorageDead(_1);
     let y = dummy(5); // this should get NRVO
     y
 }
@@ -20,6 +25,10 @@ fn nrvo() -> u8 {
 // EMIT_MIR calls.multiple_edges.CopyProp.diff
 #[custom_mir(dialect = "runtime", phase = "initial")]
 fn multiple_edges(t: bool) -> u8 {
+    // CHECK-LABEL: fn multiple_edges(
+    XXX    // CHECK: switchInt(copy _1)
+    // CHECK: _2 = dummy(const 13_u8)
+    // CHECK: _0 = copy _2;
     mir! {
         let x: u8;
         {

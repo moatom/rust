@@ -1,4 +1,3 @@
-// skip-filecheck
 // EMIT_MIR_FOR_EACH_PANIC_STRATEGY
 //@ test-mir-pass: CopyProp
 
@@ -15,6 +14,9 @@ struct Foo(u8);
 
 #[custom_mir(dialect = "runtime")]
 fn f(a: Foo) -> bool {
+    // CHECK-LABEL: fn remute(
+    // CHECK: {{_.*}} = copy ([[a:_.*]].0: u8);
+    // CHECK: _0 = opaque::<Foo>(copy [[a]])
     mir! {
         {
             let b = a;

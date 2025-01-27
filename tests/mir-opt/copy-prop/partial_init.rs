@@ -1,4 +1,3 @@
-// skip-filecheck
 //@ test-mir-pass: CopyProp
 // Verify that we do not ICE on partial initializations.
 

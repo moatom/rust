@@ -1,4 +1,3 @@
-// skip-filecheck
 //@ test-mir-pass: CopyProp
 
 #![feature(custom_mir, core_intrinsics)]
