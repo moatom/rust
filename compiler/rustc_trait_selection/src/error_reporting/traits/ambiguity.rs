@@ -154,15 +154,16 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
     #[instrument(skip(self), level = "debug")]
     pub(super) fn maybe_report_ambiguity(
         &self,
-        obligation: &PredicateObligation<'tcx>,
+        obligation: &PredicateObligation<'tcx>, // XXX
     ) -> ErrorGuaranteed {
+        eprintln!("DEBUG: XXX maybe_report_ambiguity/emit_inference_failure_err/bad_inference_failure_err 1");
         // Unable to successfully determine, probably means
         // insufficient type information, but could mean
         // ambiguous impls. The latter *ought* to be a
         // coherence violation, so we don't report it here.
 
         let predicate = self.resolve_vars_if_possible(obligation.predicate);
-        let span = obligation.cause.span;
+        let span = obligation.cause.span; // XXX
 
         debug!(?predicate, obligation.cause.code = ?obligation.cause.code());
 
@@ -176,12 +177,14 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
                 debug!(?trait_ref);
 
                 if let Err(e) = predicate.error_reported() {
+                    // eprintln!("DEBUG: XXX maybe_report_ambiguity 2");
                     return e;
                 }
 
                 if let Err(guar) = self.tcx.ensure().coherent_trait(trait_ref.def_id()) {
                     // Avoid bogus "type annotations needed `Foo: Bar`" errors on `impl Bar for Foo` in case
                     // other `Foo` impls are incoherent.
+                    // eprintln!("DEBUG: XXX maybe_report_ambiguity 3");
                     return guar;
                 }
 
@@ -200,6 +203,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
                 // avoid inundating the user with unnecessary errors, but we now
                 // check upstream for type errors and don't add the obligations to
                 // begin with in those cases.
+                eprintln!("DEBUG: XXX maybe_report_ambiguity 4");
                 if self.tcx.is_lang_item(trait_ref.def_id(), LangItem::Sized) {
                     match self.tainted_by_errors() {
                         None => {
@@ -464,6 +468,8 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
             ty::PredicateKind::Clause(ty::ClauseKind::WellFormed(arg)) => {
                 // Same hacky approach as above to avoid deluging user
                 // with error messages.
+                // eprintln!("DEBUG: XXX maybe_report_ambiguity 5(Clause) {:?}", span);
+
 
                 if let Err(e) = arg.error_reported() {
                     return e;
@@ -482,10 +488,13 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
             }
 
             ty::PredicateKind::Subtype(data) => {
+                eprintln!("DEBUG: XXX maybe_report_ambiguity 6(Subtype) {:?}", span); // XXX a1は既にここで解決される！ XXX
                 if let Err(e) = data.error_reported() {
+                    eprintln!("DEBUG: XXX maybe_report_ambiguity 61(Subtype)");
                     return e;
                 }
                 if let Some(e) = self.tainted_by_errors() {
+                    eprintln!("DEBUG: XXX maybe_report_ambiguity 62(Subtype)");
                     return e;
                 }
                 let ty::SubtypePredicate { a_is_expected: _, a, b } = data;

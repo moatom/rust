@@ -657,7 +657,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
 
     #[instrument(skip(self), level = "debug")]
     pub(crate) fn report_ambiguity_errors(&self) {
-        let mut errors = self.fulfillment_cx.borrow_mut().collect_remaining_errors(self);
+        let mut errors = self.fulfillment_cx.borrow_mut().collect_remaining_errors(self); // XXX
 
         if !errors.is_empty() {
             self.adjust_fulfillment_errors_for_expr_obligation(&mut errors);
@@ -665,7 +665,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
                 .iter()
                 .map(|e| (e.obligation.cause.span, e.root_obligation.cause.code().clone()))
                 .collect::<Vec<_>>();
-            self.err_ctxt().report_fulfillment_errors(errors);
+            self.err_ctxt().report_fulfillment_errors(errors); // XXX
             self.collect_unused_stmts_for_coerce_return_ty(errors_causecode);
         }
     }
@@ -1504,6 +1504,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
     /// If no resolution is possible, then an error is reported.
     /// Numeric inference variables may be left unresolved.
     pub(crate) fn structurally_resolve_type(&self, sp: Span, ty: Ty<'tcx>) -> Ty<'tcx> {
+        eprintln!("DEBUG structurally_resolve_type: {:?}", sp);
         let ty = self.try_structurally_resolve_type(sp, ty);
 
         if !ty.is_ty_var() {

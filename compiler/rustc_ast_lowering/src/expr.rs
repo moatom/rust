@@ -62,6 +62,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
     }
 
     pub(super) fn lower_expr_mut(&mut self, e: &Expr) -> hir::Expr<'hir> {
+        // eprintln!("DEBUG: lower_expr_mut {:?}", e.span);
         ensure_sufficient_stack(|| {
             match &e.kind {
                 // Parenthesis expression does not have a HirId and is handled specially.
@@ -346,7 +347,10 @@ impl<'hir> LoweringContext<'_, 'hir> {
                 ExprKind::InlineAsm(asm) => {
                     hir::ExprKind::InlineAsm(self.lower_inline_asm(e.span, asm))
                 }
-                ExprKind::FormatArgs(fmt) => self.lower_format_args(e.span, fmt),
+                ExprKind::FormatArgs(fmt) => {
+                    eprintln!("DEBUG: lower_expr_mut/lower_format_args {:?}", fmt); //
+                    self.lower_format_args(e.span, fmt)
+                },
                 ExprKind::OffsetOf(container, fields) => hir::ExprKind::OffsetOf(
                     self.lower_ty(
                         container,

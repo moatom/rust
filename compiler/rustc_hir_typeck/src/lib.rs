@@ -212,7 +212,8 @@ fn typeck_with_fallback<'tcx>(
     debug!(pending_obligations = ?fcx.fulfillment_cx.borrow().pending_obligations());
 
     if let None = fcx.infcx.tainted_by_errors() {
-        fcx.report_ambiguity_errors();
+        eprintln!("DEBUG: typeck_with_fallback/report_ambiguity_errors", );
+        fcx.report_ambiguity_errors(); // XXX
     }
 
     if let None = fcx.infcx.tainted_by_errors() {

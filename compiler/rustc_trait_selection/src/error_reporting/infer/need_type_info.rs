@@ -364,18 +364,21 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
         let multi_suggestions = Vec::new();
         let bad_label = Some(arg_data.make_bad_error(span));
         match error_code {
-            TypeAnnotationNeeded::E0282 => self.dcx().create_err(AnnotationRequired {
-                span,
-                source_kind,
-                source_name,
-                failure_span,
-                infer_subdiags,
-                multi_suggestions,
-                bad_label,
-                was_written: false,
-                path: Default::default(),
-                time_version: false,
-            }),
+            TypeAnnotationNeeded::E0282 => {
+                eprintln!("DEBUG: XXX emit_inference_failure_err/bad_inference_failure_err"); // ここからinvoke
+                self.dcx().create_err(AnnotationRequired {
+                    span,
+                    source_kind,
+                    source_name,
+                    failure_span,
+                    infer_subdiags,
+                    multi_suggestions,
+                    bad_label,
+                    was_written: false,
+                    path: Default::default(),
+                    time_version: false,
+                })
+            },
             TypeAnnotationNeeded::E0283 => self.dcx().create_err(AmbiguousImpl {
                 span,
                 source_kind,
@@ -410,6 +413,8 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
         error_code: TypeAnnotationNeeded,
         should_label_span: bool,
     ) -> Diag<'a> {
+        eprintln!("DEBUG: XXX emit_inference_failure_err 1");
+
         let arg = self.resolve_vars_if_possible(arg);
         let arg_data =
             self.extract_inference_diagnostics_data(arg, ty::print::RegionHighlightMode::default());
@@ -430,7 +435,8 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
         }
 
         let Some(InferSource { span, kind }) = local_visitor.infer_source else {
-            return self.bad_inference_failure_err(failure_span, arg_data, error_code);
+            eprintln!("DEBUG: XXX emit_inference_failure_err 2");
+            return self.bad_inference_failure_err(failure_span, arg_data, error_code); //
         };
 
         let (source_kind, name, path) = kind.ty_localized_msg(self);
@@ -572,17 +578,17 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
 
         match error_code {
             TypeAnnotationNeeded::E0282 => self.dcx().create_err(AnnotationRequired {
-                span,
-                source_kind,
-                source_name: &name,
-                failure_span,
-                infer_subdiags,
-                multi_suggestions,
-                bad_label: None,
-                was_written: path.is_some(),
-                path: path.unwrap_or_default(),
-                time_version,
-            }),
+                    span,
+                    source_kind,
+                    source_name: &name,
+                    failure_span,
+                    infer_subdiags,
+                    multi_suggestions,
+                    bad_label: None,
+                    was_written: path.is_some(),
+                    path: path.unwrap_or_default(),
+                    time_version,
+                }),
             TypeAnnotationNeeded::E0283 => self.dcx().create_err(AmbiguousImpl {
                 span,
                 source_kind,

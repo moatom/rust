@@ -992,6 +992,7 @@ fn expand_format_args_impl<'cx>(
     tts: TokenStream,
     nl: bool,
 ) -> MacroExpanderResult<'cx> {
+    // eprintln!("DEBUG: expand_format_args_impl {:?}", sp);
     sp = ecx.with_def_site_ctxt(sp);
     ExpandResult::Ready(match parse_args(ecx, sp, tts) {
         Ok(input) => {

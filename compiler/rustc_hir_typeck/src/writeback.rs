@@ -773,6 +773,7 @@ impl<'cx, 'tcx> Resolver<'cx, 'tcx> {
         if let Some(guar) = self.fcx.tainted_by_errors() {
             guar
         } else {
+            // eprintln!("DEBUG: XXX4");
             self.fcx
                 .err_ctxt()
                 .emit_inference_failure_err(

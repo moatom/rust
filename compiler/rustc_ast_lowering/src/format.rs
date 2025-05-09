@@ -388,7 +388,7 @@ fn make_format_spec<'hir>(
     ctx.expr_call_mut(sp, format_placeholder_new, args)
 }
 
-fn expand_format_args<'hir>(
+fn expand_format_args<'hir>( //
     ctx: &mut LoweringContext<'_, 'hir>,
     macsp: Span,
     fmt: &FormatArgs,
@@ -518,7 +518,7 @@ fn expand_format_args<'hir>(
         let elements = ctx.arena.alloc_from_iter(arguments.iter().zip(argmap).map(
             |(arg, ((_, ty), placeholder_span))| {
                 let placeholder_span =
-                    placeholder_span.unwrap_or(arg.expr.span).with_ctxt(macsp.ctxt());
+                    placeholder_span.unwrap_or(arg.expr.span).with_ctxt(macsp.ctxt());//
                 let arg_span = match arg.kind {
                     FormatArgumentKind::Captured(_) => placeholder_span,
                     _ => arg.expr.span.with_ctxt(macsp.ctxt()),
@@ -531,6 +531,7 @@ fn expand_format_args<'hir>(
                 make_argument(ctx, placeholder_span, ref_arg, ty)
             },
         ));
+        eprintln!("DEBUG: expand_format_args@use_simple_array {:?} {:?}", macsp, elements);
         ctx.expr_array_ref(macsp, elements)
     } else {
         // Generate:
@@ -547,7 +548,7 @@ fn expand_format_args<'hir>(
         let args = ctx.arena.alloc_from_iter(argmap.iter().map(
             |(&(arg_index, ty), &placeholder_span)| {
                 let arg = &arguments[arg_index];
-                let placeholder_span =
+                let placeholder_span = //
                     placeholder_span.unwrap_or(arg.expr.span).with_ctxt(macsp.ctxt());
                 let arg_span = match arg.kind {
                     FormatArgumentKind::Captured(_) => placeholder_span,
@@ -580,6 +581,7 @@ fn expand_format_args<'hir>(
             match_arms,
             hir::MatchSource::FormatArgs,
         ));
+        eprintln!("DEBUG: expand_format_args@else {:?} {:?}", macsp, match_expr);
         ctx.expr(
             macsp,
             hir::ExprKind::AddrOf(hir::BorrowKind::Ref, hir::Mutability::Not, match_expr),
@@ -594,6 +596,7 @@ fn expand_format_args<'hir>(
         //         format_options,
         //         unsafe { ::core::fmt::UnsafeArg::new() }
         //     )
+        //eprintln!("DEBUG: expand_format_args@eformat_optionsY");
         let new_v1_formatted = ctx.arena.alloc(ctx.expr_lang_item_type_relative(
             macsp,
             hir::LangItem::FormatArguments,
@@ -622,6 +625,7 @@ fn expand_format_args<'hir>(
         //         lit_pieces,
         //         args,
         //     )
+        //eprintln!("DEBUG: expand_format_args@eformat_optionsN");
         let new_v1 = ctx.arena.alloc(ctx.expr_lang_item_type_relative(
             macsp,
             hir::LangItem::FormatArguments,

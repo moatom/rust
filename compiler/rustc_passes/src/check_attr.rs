@@ -2286,6 +2286,7 @@ impl<'tcx> CheckAttrVisitor<'tcx> {
     ///
     /// If this best effort goes wrong, it will just emit a worse error later (see #102923)
     fn check_proc_macro(&self, hir_id: HirId, target: Target, kind: ProcMacroKind) {
+        // eprintln!("DEBUG: XXX61");
         if target != Target::Fn {
             return;
         }
@@ -2384,7 +2385,7 @@ impl<'tcx> CheckAttrVisitor<'tcx> {
 
         let errors = ocx.select_all_or_error();
         if !errors.is_empty() {
-            infcx.err_ctxt().report_fulfillment_errors(errors);
+            infcx.err_ctxt().report_fulfillment_errors(errors); // XXX
             self.abort.set(true);
         }
     }

@@ -122,6 +122,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
         tuple_arguments: TupleArgumentsFlag,
         expected: Expectation<'tcx>,
     ) -> Ty<'tcx> {
+        // eprintln!("DEBUG: XXX check_method_argument_types/check_argument_types");
         let has_error = match method {
             Ok(method) => method.args.error_reported().and(method.sig.error_reported()),
             Err(guar) => Err(guar),
@@ -187,6 +188,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
         // The DefId for the function being called, for better error messages
         fn_def_id: Option<DefId>,
     ) {
+        eprintln!("DEBUG: XXX check_argument_types");
         let tcx = self.tcx;
 
         // Conceptually, we've got some number of expected inputs, and some number of provided arguments
@@ -249,6 +251,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
 
         // If the arguments should be wrapped in a tuple (ex: closures), unwrap them here
         let (formal_input_tys, expected_input_tys) = if tuple_arguments == TupleArguments {
+            eprintln!("DEBUG: XXX before structurally_resolve_type");
             let tuple_type = self.structurally_resolve_type(call_span, formal_input_tys[0]);
             match tuple_type.kind() {
                 // We expected a tuple and got a tuple
@@ -328,6 +331,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
             let coerce_error =
                 self.coerce(provided_arg, checked_ty, coerced_ty, AllowTwoPhase::Yes, None).err();
             if coerce_error.is_some() {
+                //
                 return Compatibility::Incompatible(coerce_error);
             }
 
@@ -410,12 +414,12 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
                     continue;
                 }
 
-                let compatible = demand_compatible(idx);
+                let compatible = demand_compatible(idx); //
                 let is_compatible = matches!(compatible, Compatibility::Compatible);
                 compatibility_diagonal[idx] = compatible;
 
                 if !is_compatible {
-                    call_appears_satisfied = false;
+                    call_appears_satisfied = false; //
                 }
             }
         }
@@ -477,7 +481,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
             }
         }
 
-        if !call_appears_satisfied {
+        if !call_appears_satisfied { //　ここにはいかない
             let compatibility_diagonal = IndexVec::from_raw(compatibility_diagonal);
             let provided_args = IndexVec::from_iter(provided_args.iter().take(if c_variadic {
                 minimum_input_count
@@ -523,6 +527,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
         call_expr: &'tcx hir::Expr<'tcx>,
         tuple_arguments: TupleArgumentsFlag,
     ) -> ErrorGuaranteed {
+        eprintln!("DEBUG: XXX check_argument_types/report_arg_errors when incompatible");
         // Next, let's construct the error
         let (error_span, call_ident, full_call_span, call_name, is_method) = match &call_expr.kind {
             hir::ExprKind::Call(
@@ -2256,6 +2261,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
                 if *predicate == error.obligation.predicate
                     && span.contains(error.obligation.cause.span)
                 {
+                    eprintln!("DEBUG: adjust_fulfillment_errors_for_expr_obligation before_span:{:?}, obl_span:{:?}, cause_span:{:?}", span, error.obligation.cause.span, cause.span);
                     error.obligation.cause = cause.clone();
                     continue;
                 }

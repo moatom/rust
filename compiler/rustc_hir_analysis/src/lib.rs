@@ -179,7 +179,7 @@ pub fn check_crate(tcx: TyCtxt<'_>) {
     tcx.hir().par_body_owners(|item_def_id| {
         let def_kind = tcx.def_kind(item_def_id);
         if !matches!(def_kind, DefKind::AnonConst) {
-            tcx.ensure().typeck(item_def_id);
+            tcx.ensure().typeck(item_def_id); // XXX
         }
     });
 

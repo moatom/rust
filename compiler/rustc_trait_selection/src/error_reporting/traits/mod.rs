@@ -137,6 +137,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
         &self,
         mut errors: Vec<FulfillmentError<'tcx>>,
     ) -> ErrorGuaranteed {
+        eprintln!("DEBUG: XXX report_fulfillment_errors 1 {:?}", error.obligation.cause.span);
         self.sub_relations
             .borrow_mut()
             .add_constraints(self, errors.iter().map(|e| e.obligation.predicate));
@@ -179,7 +180,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
         for (index, error) in errors.iter().enumerate() {
             // We want to ignore desugarings here: spans are equivalent even
             // if one is the result of a desugaring and the other is not.
-            let mut span = error.obligation.cause.span;
+            let mut span = error.obligation.cause.span; //
             let expn_data = span.ctxt().outer_expn_data();
             if let ExpnKind::Desugaring(_) = expn_data.kind {
                 span = expn_data.call_site;
@@ -224,10 +225,12 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
 
         let mut reported = None;
 
+        eprintln!("DEBUG: XXX report_fulfillment_errors 3 {:?}", errors);
         for from_expansion in [false, true] {
             for (error, suppressed) in iter::zip(&errors, &is_suppressed) {
-                if !suppressed && error.obligation.cause.span.from_expansion() == from_expansion {
-                    let guar = self.report_fulfillment_error(error);
+                if !suppressed && error.obligation.cause.span.from_expansion() == from_expansion { // XXX macronのspanだけ、macroじゃないspanだけに分けて処理
+                    eprintln!("DEBUG: XXX report_fulfillment_errors 3 {:?}", error.obligation.cause.span);
+                    let guar = self.report_fulfillment_error(error); // XXX　XXX　XXX
                     self.infcx.set_tainted_by_errors(guar);
                     reported = Some(guar);
                     // We want to ignore desugarings here: spans are equivalent even
@@ -235,7 +238,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
                     let mut span = error.obligation.cause.span;
                     let expn_data = span.ctxt().outer_expn_data();
                     if let ExpnKind::Desugaring(_) = expn_data.kind {
-                        span = expn_data.call_site;
+                        span = expn_data.call_site; //
                     }
                     self.reported_trait_errors
                         .borrow_mut()
@@ -266,9 +269,11 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
                 | FulfillmentErrorCode::Project(_)
         ) && self.apply_do_not_recommend(&mut error.obligation)
         {
+            // eprintln!("DEBUG: XXX report_fulfillment_error ???");
             error.code = FulfillmentErrorCode::Select(SelectionError::Unimplemented);
         }
 
+        eprintln!("DEBUG: XXX report_fulfillment_error");
         match error.code {
             FulfillmentErrorCode::Select(ref selection_error) => self.report_selection_error(
                 error.obligation.clone(),
@@ -279,6 +284,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
                 self.report_projection_error(&error.obligation, e)
             }
             FulfillmentErrorCode::Ambiguity { overflow: None } => {
+                eprintln!("DEBUG: XXX report_fulfillment_error/maybe_report_ambiguity");
                 self.maybe_report_ambiguity(&error.obligation)
             }
             FulfillmentErrorCode::Ambiguity { overflow: Some(suggest_increasing_limit) } => {

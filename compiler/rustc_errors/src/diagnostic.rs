@@ -1320,7 +1320,7 @@ impl<'a, G: EmissionGuarantee> Diag<'a, G> {
             diag.level,
         );
 
-        let guar = self.dcx.emit_diagnostic(diag);
+        let guar = self.dcx.emit_diagnostic(diag); // XXX
         guar.unwrap()
     }
 
