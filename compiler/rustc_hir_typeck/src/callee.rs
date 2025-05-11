@@ -78,6 +78,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
             _ => self.check_expr(callee_expr),
         };
 
+        eprintln!("DEBUG: XXX to structurally_resolve_type1 {:?}", call_expr.span);
         let expr_ty = self.structurally_resolve_type(call_expr.span, original_callee_ty);
 
         let mut autoderef = self.autoderef(callee_expr.span, expr_ty);
@@ -89,6 +90,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
 
         let output = match result {
             None => {
+                eprintln!("DEBUG: XXX to structurally_resolve_type2 {:?}", arg_exprs);
                 // this will report an error since original_callee_ty is not a fn
                 self.confirm_builtin_call(
                     call_expr,
@@ -100,14 +102,17 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
             }
 
             Some(CallStep::Builtin(callee_ty)) => {
+                eprintln!("DEBUG: XXX to structurally_resolve_type3 {:?}", arg_exprs);
                 self.confirm_builtin_call(call_expr, callee_expr, callee_ty, arg_exprs, expected)
             }
 
             Some(CallStep::DeferredClosure(def_id, fn_sig)) => {
+                eprintln!("DEBUG: XXX to structurally_resolve_type4 {:?}", arg_exprs);
                 self.confirm_deferred_closure_call(call_expr, arg_exprs, expected, def_id, fn_sig)
             }
 
             Some(CallStep::Overloaded(method_callee)) => {
+                eprintln!("DEBUG: XXX to structurally_resolve_type5 {:?}", arg_exprs);
                 self.confirm_overloaded_call(call_expr, arg_exprs, expected, method_callee)
             }
         };
@@ -494,6 +499,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
         let fn_sig = self.instantiate_binder_with_fresh_vars(call_expr.span, infer::FnCall, fn_sig);
         let fn_sig = self.normalize(call_expr.span, fn_sig);
 
+        eprintln!("DEBUG: confirm_builtin_call");
         self.check_argument_types(
             call_expr.span,
             call_expr,
@@ -814,6 +820,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
         closure_def_id: LocalDefId,
         fn_sig: ty::FnSig<'tcx>,
     ) -> Ty<'tcx> {
+        eprintln!("DEBUG: confirm_deferred_closure_call");
         // `fn_sig` is the *signature* of the closure being called. We
         // don't know the full details yet (`Fn` vs `FnMut` etc), but we
         // do know the types expected for each argument and the return

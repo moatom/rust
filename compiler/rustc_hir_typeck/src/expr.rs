@@ -255,7 +255,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
             hir::ExprKind::Path(
                 qpath @ (hir::QPath::Resolved(..) | hir::QPath::TypeRelative(..)),
             ) => self.check_expr_path(qpath, expr, call_expr_and_args),
-            _ => self.check_expr_kind(expr, expected),
+            _ => self.check_expr_kind(expr, expected), // 
         });
         let ty = self.resolve_vars_if_possible(ty);
 
@@ -490,7 +490,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
     }
 
     #[instrument(skip(self, expr), level = "debug")]
-    fn check_expr_kind(
+    fn check_expr_kind( //
         &self,
         expr: &'tcx hir::Expr<'tcx>,
         expected: Expectation<'tcx>,
@@ -545,7 +545,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
             }
             ExprKind::Closure(closure) => self.check_expr_closure(closure, expr.span, expected),
             ExprKind::Block(body, _) => self.check_expr_block(body, expected),
-            ExprKind::Call(callee, args) => self.check_expr_call(expr, callee, args, expected),
+            ExprKind::Call(callee, args) => self.check_expr_call(expr, callee, args, expected), //
             ExprKind::MethodCall(segment, receiver, args, _) => {
                 self.check_expr_method_call(expr, segment, receiver, args, expected)
             }

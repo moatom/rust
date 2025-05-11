@@ -290,6 +290,7 @@ impl FlagComputation {
                 self.add_ty(ty);
             }
             ty::PredicateKind::Subtype(ty::SubtypePredicate { a_is_expected: _, a, b }) => {
+                eprintln!("DEBUG: XXX add_predicate_atom");
                 self.add_ty(a);
                 self.add_ty(b);
             }

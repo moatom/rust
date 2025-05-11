@@ -866,6 +866,7 @@ fn run_required_analyses(tcx: TyCtxt<'_>) {
         );
     });
 
+    eprintln!("DEBUG: run_required_analyses/check_crate/par_body_owners");
     rustc_hir_analysis::check_crate(tcx);
     sess.time("MIR_coroutine_by_move_body", || {
         tcx.hir().par_body_owners(|def_id| {

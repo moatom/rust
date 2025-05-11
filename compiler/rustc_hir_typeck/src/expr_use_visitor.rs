@@ -1223,6 +1223,7 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
                     .get(pat.hir_id)
                     .expect("missing binding mode");
 
+                eprintln!("DEBUG: XXX to structurally_resolve_type3 {:?}", pat.span);
                 if matches!(bm.0, hir::ByRef::Yes(_)) {
                     // a bind-by-ref means that the base_ty will be the type of the ident itself,
                     // but what we want here is the type of the underlying value being borrowed.
@@ -1513,6 +1514,8 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
         node: HirId,
         base_place: PlaceWithHirId<'tcx>,
     ) -> Result<PlaceWithHirId<'tcx>, Cx::Error> {
+        eprintln!("DEBUG: XXX cat_deref {:?}", self.cx.tcx().hir().span(base_place.hir_id));
+
         let base_curr_ty = base_place.place.ty();
         let deref_ty = match self
             .cx
@@ -1615,6 +1618,7 @@ impl<'tcx, Cx: TypeInformationCtxt<'tcx>, D: Delegate<'tcx>> ExprUseVisitor<'tcx
     where
         F: FnMut(&PlaceWithHirId<'tcx>, &hir::Pat<'_>) -> Result<(), Cx::Error>,
     {
+        eprintln!("DEBUG: XXX cat_pattern {:?}", pat.span);
         // If (pattern) adjustments are active for this pattern, adjust the `PlaceWithHirId` correspondingly.
         // `PlaceWithHirId`s are constructed differently from patterns. For example, in
         //

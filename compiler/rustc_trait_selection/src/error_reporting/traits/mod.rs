@@ -137,7 +137,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
         &self,
         mut errors: Vec<FulfillmentError<'tcx>>,
     ) -> ErrorGuaranteed {
-        eprintln!("DEBUG: XXX report_fulfillment_errors 1 {:?}", error.obligation.cause.span);
+        eprintln!("DEBUG: XXX report_fulfillment_errors 1 {:?}", errors.iter().map(|e: &FulfillmentError<'tcx>| e.obligation.cause.span).collect::<Vec<_>>());
         self.sub_relations
             .borrow_mut()
             .add_constraints(self, errors.iter().map(|e| e.obligation.predicate));
@@ -170,11 +170,21 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
             ty::PredicateKind::Clause(ty::ClauseKind::Trait(pred))
                 if self.tcx.is_lang_item(pred.def_id(), LangItem::Sized) =>
             {
-                1
+                (1, 0, 0)
             }
-            ty::PredicateKind::Clause(ty::ClauseKind::WellFormed(_)) => 3,
-            ty::PredicateKind::Coerce(_) => 2,
-            _ => 0,
+            ty::PredicateKind::Clause(ty::ClauseKind::WellFormed(_)) => (3, 0, 0),
+            ty::PredicateKind::Coerce(_) => (2, 0, 0),
+            ty::PredicateKind::Subtype(_) =>
+            {
+                (-1, e.obligation.cause.span.len(), -(e.obligation.cause.span.index() as i32))
+            }
+            // ty::PredicateKind::Subtype(_) =>
+            // {
+            //     let a = -(e.obligation.cause.span.len() as i32);
+            //     eprintln!("DEBUG: XXX {:?}", a);
+            //     (0, a)
+            // }
+            _ => (0, 0, 0),
         });
 
         for (index, error) in errors.iter().enumerate() {
@@ -225,7 +235,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
 
         let mut reported = None;
 
-        eprintln!("DEBUG: XXX report_fulfillment_errors 3 {:?}", errors);
+        // eprintln!("DEBUG: XXX report_fulfillment_errors 3 {:?}", errors);
         for from_expansion in [false, true] {
             for (error, suppressed) in iter::zip(&errors, &is_suppressed) {
                 if !suppressed && error.obligation.cause.span.from_expansion() == from_expansion { // XXX macronのspanだけ、macroじゃないspanだけに分けて処理

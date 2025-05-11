@@ -171,6 +171,7 @@ fn typeck_with_fallback<'tcx>(
 
         let wf_code = ObligationCauseCode::WellFormed(Some(WellFormedLoc::Ty(def_id)));
         fcx.register_wf_obligation(expected_type.into(), body.value.span, wf_code);
+        eprintln!("DEBUG: typeck_with_fallback {:?}", body.value.span);
 
         fcx.require_type_is_sized(expected_type, body.value.span, ObligationCauseCode::ConstSized);
 

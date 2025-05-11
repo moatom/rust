@@ -53,6 +53,7 @@ impl SubRelations {
         infcx: &InferCtxt<'tcx>,
         obls: impl IntoIterator<Item = ty::Predicate<'tcx>>,
     ) {
+        eprintln!("DEBUG: XXX add_constraints");
         for p in obls {
             let (a, b) = match p.kind().skip_binder() {
                 ty::PredicateKind::Subtype(ty::SubtypePredicate { a_is_expected: _, a, b }) => {

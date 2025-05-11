@@ -97,6 +97,7 @@ where
 
     #[instrument(level = "trace", skip(self))]
     fn compute_coerce_goal(&mut self, goal: Goal<I, ty::CoercePredicate<I>>) -> QueryResult<I> {
+        eprintln!("DEBUG: XXX compute_coerce_goal");
         self.compute_subtype_goal(Goal {
             param_env: goal.param_env,
             predicate: ty::SubtypePredicate {
@@ -109,6 +110,7 @@ where
 
     #[instrument(level = "trace", skip(self))]
     fn compute_subtype_goal(&mut self, goal: Goal<I, ty::SubtypePredicate<I>>) -> QueryResult<I> {
+        eprintln!("DEBUG: XXX compute_subtype_goal");
         if goal.predicate.a.is_ty_var() && goal.predicate.b.is_ty_var() {
             self.evaluate_added_goals_and_make_canonical_response(Certainty::AMBIGUOUS)
         } else {

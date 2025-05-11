@@ -206,7 +206,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
         // All the input types from the fn signature must outlive the call
         // so as to validate implied bounds.
         for (&fn_input_ty, arg_expr) in iter::zip(formal_input_tys, provided_args) {
-            self.register_wf_obligation(
+            self.register_wf_obligation( //
                 fn_input_ty.into(),
                 arg_expr.span,
                 ObligationCauseCode::Misc,
@@ -326,7 +326,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
             // Cause selection errors caused by resolving a single argument to point at the
             // argument and not the call. This lets us customize the span pointed to in the
             // fulfillment error to be more accurate.
-            let coerced_ty = self.resolve_vars_with_obligations(coerced_ty);
+            let coerced_ty = self.resolve_vars_with_obligations(coerced_ty); //
 
             let coerce_error =
                 self.coerce(provided_arg, checked_ty, coerced_ty, AllowTwoPhase::Yes, None).err();
@@ -335,18 +335,19 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
                 return Compatibility::Incompatible(coerce_error);
             }
 
+            eprintln!("DEBUG: {:?}", provided_arg.span);
             // 3. Check if the formal type is actually equal to the checked one
             //    and register any such obligations for future type checks.
             let formal_ty_error = self.at(&self.misc(provided_arg.span), self.param_env).eq(
                 DefineOpaqueTypes::Yes,
                 formal_input_ty,
                 coerced_ty,
-            );
+            ); // XXX gen obligations
 
             // If neither check failed, the types are compatible
             match formal_ty_error {
                 Ok(InferOk { obligations, value: () }) => {
-                    self.register_predicates(obligations);
+                    self.register_predicates(obligations); //
                     Compatibility::Compatible
                 }
                 Err(err) => Compatibility::Incompatible(Some(err)),
@@ -419,7 +420,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
                 compatibility_diagonal[idx] = compatible;
 
                 if !is_compatible {
-                    call_appears_satisfied = false; //
+                    call_appears_satisfied = false; // //　ここにはいかない
                 }
             }
         }
@@ -454,6 +455,7 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
 
                 // There are a few types which get autopromoted when passed via varargs
                 // in C but we just error out instead and require explicit casts.
+                eprintln!("DEBUG: check_argument_types2/structurally_resolve_type {:?}", arg.span);
                 let arg_ty = self.structurally_resolve_type(arg.span, arg_ty);
                 match arg_ty.kind() {
                     ty::Float(ty::FloatTy::F32) => {
@@ -482,6 +484,8 @@ impl<'a, 'tcx> FnCtxt<'a, 'tcx> {
         }
 
         if !call_appears_satisfied { //　ここにはいかない
+            eprintln!("DEBUG: check_argument_types 3");
+
             let compatibility_diagonal = IndexVec::from_raw(compatibility_diagonal);
             let provided_args = IndexVec::from_iter(provided_args.iter().take(if c_variadic {
                 minimum_input_count

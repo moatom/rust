@@ -46,6 +46,7 @@ impl<'a, 'tcx> Expectation<'tcx> {
     ) -> Expectation<'tcx> {
         match *self {
             ExpectHasType(ety) => {
+                eprintln!("DEBUG: XXX to structurally_resolve_type2 {:?}", span);
                 let ety = fcx.try_structurally_resolve_type(span, ety);
                 if !ety.is_ty_var() { ExpectHasType(ety) } else { NoExpectation }
             }

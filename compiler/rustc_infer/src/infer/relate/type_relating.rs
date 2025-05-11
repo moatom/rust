@@ -117,6 +117,7 @@ impl<'tcx> TypeRelation<TyCtxt<'tcx>> for TypeRelating<'_, 'tcx> {
 
     #[instrument(skip(self), level = "trace")]
     fn tys(&mut self, a: Ty<'tcx>, b: Ty<'tcx>) -> RelateResult<'tcx, Ty<'tcx>> {
+        // eprintln!("DEBUG: XXX type-tys");
         if a == b {
             return Ok(a);
         }

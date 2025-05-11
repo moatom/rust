@@ -164,6 +164,8 @@ where
 
     #[instrument(skip(self), level = "trace")]
     fn tys(&mut self, a: I::Ty, b: I::Ty) -> RelateResult<I, I::Ty> {
+        eprintln!("DEBUG: XXX solver-tys");
+
         if a == b {
             return Ok(a);
         }
